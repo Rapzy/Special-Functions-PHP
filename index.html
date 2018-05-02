@@ -13,14 +13,61 @@
 			min-height: 100vh;
 			margin: 0;
 		}
+		input[type="text"]{
+			height: 35px;
+			margin: 0;
+			font-size: 25px;
+			display: block;
+			box-sizing: content-box;
+			float: left;
+		}
+		input[type="submit"]{
+			height: 35px;
+			margin: 0;
+			font-size: 20px;
+			display: block;
+			box-sizing: content-box;
+			float: left;
+		}
+		label{
+			font-size: 20px;
+		}
+		h1{
+			text-align: center;
+		}
 	</style>
-	<form action="script.php">
-		<input type="text" name="str_in">
-		<input type="submit"><br>
-		<input type="radio" name="lang" id="radio1" value="ru" checked>
-		<label for="radio1">Русский</label><br>
-		<input type="radio" name="lang" id="radio2" value="en">
-		<label for="radio2">Английский</label>
-	</form>
+	<div>
+		<h1 id="title">Введите число</h1>
+		<form action="script.php">
+			<input type="text" name="str_in" id="str_in">
+			<input type="submit" id="btn"><br>
+			<input type="radio" name="lang" id="radio1" value="ru" checked>
+			<label for="radio1">Русский</label><br>
+			<input type="radio" name="lang" id="radio2" value="en">
+			<label for="radio2">English</label>
+		</form>
+	</div>
+	<script>
+		var msg = 'Проверьте корректность!';
+		document.getElementById("radio2").onclick = function() {
+			document.getElementById("title").innerHTML='Enter number';
+			document.getElementById("btn").value='Submit';
+			msg = 'Check validate!';
+		};
+		document.getElementById("radio1").onclick = function() {
+			document.getElementById("title").innerHTML='Введите число';
+			document.getElementById("btn").value='Отправить';
+			msg = 'Проверьте корректность!';
+		};
+		document.getElementById('btn').onclick = function(event){
+			var str = document.getElementById("str_in").value;
+			if (!isFinite(str) || str == '' || str.trim().length > 21){
+				alert(msg);
+				event.preventDefault();
+				return;
+			};
+		}
+
+	</script>
 </body>
 </html>
