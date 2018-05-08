@@ -29,12 +29,17 @@
 <?php
 	$str_in = htmlentities($_GET['str_in']);
 	$lang = $_GET['lang'];
-	$str_in = str_replace(array(',', ' ','.'), '' , trim($str_in));
-	$str_out = ExpressNumToWord($str_in,$lang);
-	for ($i = strlen($str_in) - 1; $i >= 0; $i--) { 
+	$str_out = "";
+	$str_in = DeleteBadChar($str_in);
+	$str_out .= ExpressNumToWord($str_in,$lang);
+	$pos = [];
+	for ($i = strlen($str_in) - 1; $i >= 0; $i--) {
 		if ((strlen($str_in) - $i) % 3 == 0) {
-			$str_in = substr_replace($str_in, " ", $i,0);	
+			$pos[count($pos)] = $i;
 		}
+	}
+	for ($i=0; $i < count($pos); $i++) {
+		$str_in = substr_replace($str_in, " ", $pos[$i],0);
 	}
 	echo "<div><span id='number'>$str_in</span><br><span id='text'>$str_out</span>";
 	if ($lang == 'en') {
@@ -43,18 +48,31 @@
 	else{
 		echo "<br><a href='index.html'>На главную</a></div>";
 	}
-	function ExpressNumToWord($str_in, $lang)
+	function DeleteBadChar($str){
+		$minus = "";
+		if (substr($str,0,1) == '-'){
+			$minus = "-";
+			$str = substr($str,1);
+		}
+		preg_match('[^\D]',$str,$matches);
+		$str = str_replace($matches, '' , trim($str));
+		while (substr($str,0,1) == '0' && strlen($str) > 1) {
+			$str=substr($str,1);
+		}
+		return $minus.$str;
+	}
+	function ExpressNumToWord($str, $lang)
 	{
 		$digits = [
 			"ru" => [
-				["ноль","один","два","три","четыре","пять","шесть","семь","восемь","девять","десять","одиннадцать","двенадцать","тринадцать","четырнадцать","пятнадцать","шестнадцать","семнадцать","восемнадцать","девятнадцать"],
+				["","один","два","три","четыре","пять","шесть","семь","восемь","девять","десять","одиннадцать","двенадцать","тринадцать","четырнадцать","пятнадцать","шестнадцать","семнадцать","восемнадцать","девятнадцать"],
 				["","десять","двадцать","тридцать","сорок","пятьдесят","шестьдесят","семьдесят","восемдесят","девяноста"],
 				["","сто","двести","триста","четыреста","пятьсот","шестьсот","семьсот","восемьсот","девятьсот"]
 			],
 			"en" => [
 				["zero","one","two","three","four","five","six","seven","eight","nine","ten","eleven","twelve","thirteen","fourteen","fifteen","sixteen","seventeen","eighteen","nineteen"],
 				["","ten","twenty","thirty","forty","fifty","sixty","seventy","eighty","ninety"]
-			] 
+			]
 		];
 		$words = [
 			"ru" => [
@@ -68,23 +86,31 @@
 		];
 		$word = "";
 		$str_out = "";
-		if (substr($str_in, 0, 1) == '-'){
+		if (substr($str, 0, 1) == '-'){
 			if ($lang == 'ru') {
 				$str_out .= "минус ";
 			}
 			else{
 				$str_out .= "minus ";
 			}
-			$str_in = substr($str_in, 1);
+			$str = substr($str, 1);
 		}
-		$len = strlen($str_in);
-		$pos = $len; 
+		if (substr($str, 0, 1) == '0' && strlen($str) == 1){
+			if ($lang == 'ru') {
+				return 'ноль';
+			}
+			elseif ($lang == 'en') {
+				return 'zero';
+			}
+		}
+		$len = strlen($str);
+		$pos = $len;
 		for ($i = 1; $i <= $len; $i++) {
-			$digit = 1 * substr($str_in, $i-1, 1);
+			$digit = 1 * substr($str, $i-1, 1);
 			$place = $len - $i;
 			if ($digit == 1 && $place % 3 == 1) {
 				$i++;
-				$digit = 1 * substr($str_in, $i-1, 1);
+				$digit = 1 * substr($str, $i-1, 1);
 				$digit += 10;
 				$place = $len - $i;
 			}
@@ -100,6 +126,14 @@
 				}
 				if (intdiv($pos - 1, 3)) {
 					$word = $words[$lang][$case][intdiv($pos - 1, 3)];
+					if ($lang == 'ru') {
+						if ($case == 0 && intdiv($pos - 1, 3) == 1){
+							$digits['ru'][0][1] = 'одна';
+						}
+						if ($case == 0 && intdiv($pos - 1, 3) == 1){
+							$digits['ru'][0][2] = 'две';
+						}
+					}
 				}
 				$pos = $place;
 			}
