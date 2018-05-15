@@ -54,8 +54,7 @@
 			$minus = "-";
 			$str = substr($str,1);
 		}
-		preg_match('[^\D]',$str,$matches);
-		$str = str_replace($matches, '' , trim($str));
+		$str = preg_replace('[\D]','',$str);
 		while (substr($str,0,1) == '0' && strlen($str) > 1) {
 			$str=substr($str,1);
 		}
@@ -127,10 +126,10 @@
 				if (intdiv($pos - 1, 3)) {
 					$word = $words[$lang][$case][intdiv($pos - 1, 3)];
 					if ($lang == 'ru') {
-						if ($case == 0 && intdiv($pos - 1, 3) == 1){
+						if ($case == 0){
 							$digits['ru'][0][1] = 'одна';
 						}
-						if ($case == 0 && intdiv($pos - 1, 3) == 1){
+						elseif ($case == 1){
 							$digits['ru'][0][2] = 'две';
 						}
 					}
@@ -152,6 +151,8 @@
 			else {
 				$str_out .= $digits[$lang][$place % 3][$digit]." ".$word." ";
 			}
+			$digits['ru'][0][1] = 'один';
+			$digits['ru'][0][2] = 'два';
 			$word = "";
 		}
 		return $str_out;
