@@ -32,15 +32,7 @@
 	$str_out = "";
 	$str_in = DeleteBadChar($str_in);
 	$str_out .= ExpressNumToWord($str_in,$lang);
-	$pos = [];
-	for ($i = strlen($str_in) - 1; $i >= 0; $i--) {
-		if ((strlen($str_in) - $i) % 3 == 0) {
-			$pos[count($pos)] = $i;
-		}
-	}
-	for ($i=0; $i < count($pos); $i++) {
-		$str_in = substr_replace($str_in, " ", $pos[$i],0);
-	}
+	$str_in = number_format($str_in, 0 , '.', ' ');
 	echo "<div><span id='number'>$str_in</span><br><span id='text'>$str_out</span>";
 	if ($lang == 'en') {
 		echo "<br><a href='index.html'>Home</a></div>";
